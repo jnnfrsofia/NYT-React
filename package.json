@@ -1,0 +1,23 @@
+{
+  "name": "nyt-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jnnfrsofia/NYT-React.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jnnfrsofia/NYT-React/issues"
+  },
+  "homepage": "https://github.com/jnnfrsofia/NYT-React#readme",
+  "dependencies": {
+    "express": "^4.15.4"
+  }
+}
