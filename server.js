@@ -4,8 +4,8 @@ var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 
-// Require History Schema
-var History = require("./models/Article");
+// Require Article Schema
+var Article = require("./models/Article");
 
 // Create Instance of Express
 var app = express();
@@ -25,6 +25,7 @@ app.use(express.static("public"));
 
 // MongoDB Configuration configuration (Change this URL to your own DB)
 mongoose.connect("mongodb://localhost:27017/NYTReact");
+
 var db = mongoose.connection;
 
 db.on("error", function(err) {
@@ -42,41 +43,61 @@ app.get("/", function(req, res) {
   res.sendFile(__dirname + "/public/index.html");
 });
 
-// This is the route we will send GET requests to retrieve our most recent search data.
-// We will call this route the moment our page gets rendered
-// app.get("/api", function(req, res) {
+var db = mongoose.connection;
 
-//   // We will find all the records, sort it in descending order, then limit the records to 5
-//   History.find({}).sort([
-//     ["date", "descending"]
-//   ]).limit(5).exec(function(err, doc) {
-//     if (err) {
-//       console.log(err);
-//     }
-//     else {
-//       res.send(doc);
-//     }
-//   });
-// });
+db.on('error', function (err) {
+  console.log('Mongoose Error: ', err);
+});
 
-// // This is the route we will send POST requests to save each search.
-// app.post("/api", function(req, res) {
-//   console.log("BODY: " + req.body.location);
+db.once('open', function () {
+  console.log('Mongoose connection successful.');
+});
 
-//   // Here we'll save the location based on the JSON input.
-//   // We'll use Date.now() to always get the current date time
-//   History.create({
-//     location: req.body.location,
-//     date: Date.now()
-//   }, function(err) {
-//     if (err) {
-//       console.log(err);
-//     }
-//     else {
-//       res.send("Saved Search");
-//     }
-//   });
-// });
+app.get('/', function(req, res){
+  res.sendFile('./public/index.html');
+})
+
+app.get('/api/saved', function(req, res) {
+
+  Article.find({})
+    .exec(function(err, doc){
+
+      if(err){
+        console.log(err);
+      }
+      else {
+        res.send(doc);
+      }
+    })
+});
+
+app.post('/api/saved', function(req, res){
+
+  var newArticle = new Article({
+    title: req.body.title,
+    date: req.body.date,
+    url: req.body.url
+  });
+
+  newArticle.save(function(err, doc){
+    if(err){
+      console.log(err);
+      res.send(err);
+    } else {
+      res.json(doc);
+    }
+  });
+
+});
+
+app.delete('/api/saved/:id', function(req, res){
+
+  Article.find({'_id': req.params.id}).remove()
+    .exec(function(err, doc) {
+      res.send(doc);
+  });
+
+});
 
 // -------------------------------------------------
 
