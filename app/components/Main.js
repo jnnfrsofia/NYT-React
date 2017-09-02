@@ -4,7 +4,7 @@ var React = require("react");
 // Here we include all of the sub-components
 var Form = require("./children/Form");
 var Results = require("./children/Results");
-var History = require("./children/Saved");
+var Saved = require("./children/Saved");
 
 // Helper for making AJAX requests to our API
 var helpers = require("./utils/helpers");
@@ -13,56 +13,34 @@ var helpers = require("./utils/helpers");
 var Main = React.createClass({
 
   // Here we set a generic state associated with the number of clicks
-  // Note how we added in this history state variable
-  getInitialState: function() {
-    return { searchTerm: "", results: "", saved: [] };
+  getInitialState: function(){
+    return {
+      topic: "",
+      startYear: "",
+      endYear: "",
+      results: [],
+      savedArticles: []
+    }
+  },  
+
+  // We use this function to allow children to update the parent with searchTerms.
+  setTerm: function(tpc, stYr, endYr){
+    this.setState({
+      topic: tpc,
+      startYear: stYr,
+      endYear: endYr
+    })
   },
-
-  // The moment the page renders get the saved articles
-  componentDidMount: function() {
-    helpers.getHistory().then(function(response) {
-      console.log(response);
-      if (response !== this.state.history) {
-        console.log("Saved", response.data);
-        this.setState({ saved: response.data });
-      }
-    }.bind(this));
-  },
-
-  // If the component changes (i.e. if a search is entered)...
-  componentDidUpdate: function() {
-
-    // Run the query for the article
-    helpers.runQuery(this.state.searchTerm).then(function(data) {
-      if (data !== this.state.results) {
-        console.log("Title", data);
-        this.setState({ results: data });
-
-        // After we've received the result... then post the articles to our saved articles.
-        helpers.saveArticle(this.state.searchTerm).then(function() {
-          console.log("Updated!");
-
-          // After we've done the post... then get the updated list of saved articles
-          helpers.getSaved().then(function(response) {
-            console.log("Saved Articles", response.data);
-
-            this.setState({ savedArticles: response.data });
-
-          }.bind(this));
-        }.bind(this));
-      }
-    }.bind(this));
-  },
-  // This function allows childrens to update the parent.
-  setTerm: function(term) {
-    this.setState({ searchTerm: term });
-  },
-
   saveArticle: function(title, date, url){
     helpers.postArticle(title, date, url);
     this.getArticle();
   },
-
+  searchArticle: function(tpc, stYr, endYr){
+    helpers.runQuery(tpc, stYr, endYr);
+    return {
+      results: response.data
+    }
+  },
   deleteArticle: function(article){
     console.log(article);
     axios.delete('/api/saved/' + article._id)
@@ -93,7 +71,7 @@ var Main = React.createClass({
         <div className="row">
 
           <div className="jumbotron" >
-            <h2 className="text-center">New York Times Article Search and Save</h2>
+            <h2 className="text-center">New York Times Article Scrubber</h2>
             <p className="text-center">Search for articles by topic within a certain year range & save articles you find interesting!</p>
           </div>
         </div>

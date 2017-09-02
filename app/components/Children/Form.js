@@ -1,13 +1,16 @@
 // Include React 
 var React = require('react');
 
+// Helper for making AJAX requests to our API
+var helpers = require("../utils/helpers");
+
 // Component creation
 var Form = React.createClass({
 
   // Here we set a generic state associated with the text being searched for
   getInitialState: function(){
     return {
-      searchTerm: "",
+      topic: "",
       startYear: "",
       endYear: ""
     }
@@ -27,9 +30,21 @@ var Form = React.createClass({
   handleClick: function(){
   
     // Set the parent to have the search term, start year, and end year
-    this.props.setTerm(this.state.searchTerm, this.state.startYear, this.state.endYear);
+    this.props.setTerm(this.state.topic, this.state.startYear, this.state.endYear);
+    console.log("search button clicked");
 
-  },
+    // Run the query for the address
+    helpers.runQuery(this.state.topic, this.state.startYear, this.state.endYear).then(function(data) {
+          if (data) {
+                if (JSON.stringify(data) !== JSON.stringify(this.state.results)) {
+                        this.setState({results: data});
+                    }
+          } 
+          else {
+                    this.setState({message: 'No results found!'})
+                }
+            }.bind(this));
+        },
 
   // Here we render the function
   render: function(){

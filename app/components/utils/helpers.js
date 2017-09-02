@@ -2,14 +2,12 @@
 var axios = require("axios");
 
 // Geocoder API
-var NYTAPI = "097be422255e45a18b6864a8176f4a6c";
+var nytAPI = "097be422255e45a18b6864a8176f4a6c";
 
 // Helper functions for making API Calls
-var helper = {
+var helpers = {
 
-        // Helper Functions
-        var helpers = {
-
+      
             runQuery: function(topic, startYear, endYear) {
 
                 //Figure out the article results
@@ -36,6 +34,7 @@ var helper = {
                         }
 
                         return newResults;
+                        console.log(newResults);
                     })
 
             },
@@ -52,8 +51,6 @@ var helper = {
                     })
             }
         }
-
-    }
 
 
         // We export the helpers function 
